@@ -2,13 +2,48 @@ package tables
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
 
+func TestOneTable(t *testing.T) {
+	tbl := NewTable("Col1", "Col2", "Col3", "Col4")
+	if len(tbl.columns) != 4 {
+		t.Error("Expected 2 columns, got", len(tbl.columns))
+	}
+	err := tbl.AddRow("Something longer than the column header", "short", "3.14", "")
+	if err != nil {
+		t.Error("Expected no error, got", err)
+	}
+	err = tbl.AddRow("x", "y")
+	if err == nil {
+		t.Error("Expected error, got nothing")
+	}
+	for i := 0; i < 3; i++ {
+		err := tbl.AddRow(strconv.Itoa(i+1), strconv.Itoa((i+1)*2), strconv.Itoa((i+1)*3), strconv.Itoa((i+1)*4))
+		if err != nil {
+			t.Error("Expected no error, got", err)
+		}
+	}
+
+	tbl.SetBorder(Center, true, false)
+	tbl.SetBorder(Header, true, false)
+	// tbl.SetBorder(Top, true, false)
+
+	for i := 0; i < len(tbl.columns); i++ {
+		padding := tbl.padding(true, i)
+		fmt.Printf("Column %d pre-content padding = %d (%t)\n", i, padding, tbl.borders.showCenter)
+		padding = tbl.padding(false, i)
+		fmt.Printf("Column %d post-content padding = %d (%t)\n", i, padding, tbl.borders.showCenter)
+	}
+
+	tbl.Print()
+}
+
 func TestNewTable(t *testing.T) {
 	tbl := NewTable("Col1", "Col2", "Col 3")
-	if len(tbl.columns) != 2 {
+	if len(tbl.columns) != 3 {
 		t.Error("Expected 2 columns, got", len(tbl.columns))
 	}
 	err := tbl.AddRow("a", "b", "c")
@@ -74,7 +109,7 @@ func TestNewTable(t *testing.T) {
 	for i := 0; i < 128; i++ {
 		for j := 0; j < 128; j++ {
 			next = buildConf((j&Left != 0), (j&Center != 0), (j&Right != 0), (j&Top != 0), (j&Header != 0), (j&Bottom != 0), (j&Horizontal != 0), (i&Left != 0), (i&Center != 0), (i&Right != 0), (i&Top != 0), (i&Header != 0), (i&Bottom != 0), (i&Horizontal != 0))
-			if utils.IntInArray(next, done) == -1 {
+			if intInArray(next, done) == -1 {
 				done = append(done, next)
 				printWithConf(tbl, (j&Left != 0), (j&Center != 0), (j&Right != 0), (j&Top != 0), (j&Header != 0), (j&Bottom != 0), (j&Horizontal != 0), (i&Left != 0), (i&Center != 0), (i&Right != 0), (i&Top != 0), (i&Header != 0), (i&Bottom != 0), (i&Horizontal != 0))
 				if line%3 == 2 {
@@ -234,3 +269,15 @@ func printWithConf(tbl *Table, sLeft, sCenter, sRight, sTop, sHeader, sBottom, s
 // Header+Bold, Vertical+Bold (HeaderBorder Missing)
 // Top, Header+Bold, Vertical (HeaderBorder Bold Vertical on middle & end)
 // Top+Bold, Header+Bold, Vertical (HeaderBorder Bold Vertical on middle & end)
+
+// intInArray checks if the integer is in the array
+func intInArray(needle int, haystack []int) (index int) {
+	var val int
+	for index, val = range haystack {
+		if val == needle {
+			return
+		}
+	}
+	index = -1
+	return
+}

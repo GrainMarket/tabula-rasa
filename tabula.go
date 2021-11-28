@@ -155,38 +155,6 @@ func (tbl *Table) Align(colName string, alignment int, includeHeader bool) {
 	}
 }
 
-func (tbl *Table) calcWidth(column string, pad bool) int {
-	if pad {
-		if tbl.borders.showCenter {
-			return tbl.columnWidths[column] + (DefaultPadding * 2)
-		}
-		return tbl.columnWidths[column] + DefaultPadding
-	}
-	return tbl.columnWidths[column]
-}
-
-func (tbl *Table) padding(before bool, colIndex int) int {
-	if colIndex == 0 { // First column
-		if (before && !tbl.borders.showLeft) || (!before && !tbl.borders.showCenter) { // spacing before content with no left border or spacing after content with no center border
-			return 0
-		}
-		return DefaultPadding // spacing after content, or before content with left border
-
-	} else if colIndex == len(tbl.columns)-1 { // Last column
-		if before || tbl.borders.showRight { // spacing before content, or after content with right border
-			return DefaultPadding
-		}
-		return 0 // spacing after content with no right border
-
-	} else { // Middle columns
-		if tbl.borders.showCenter { // spacing before content, or after content with center border
-			return DefaultPadding
-		}
-		return 0 // spacing after content with no center border
-
-	}
-}
-
 func (tbl *Table) Print() {
 	for _, row := range tbl.rows {
 		for col, cell := range row {
@@ -283,7 +251,7 @@ func (tbl *Table) printHeaderBorder() {
 				fmt.Print(strings.Repeat("─", tbl.calcWidth(tbl.columns[i], true)))
 			}
 			if tbl.borders.showCenter && i < len(tbl.columns)-1 {
-				if tbl.borders.showCenter && tbl.borders.showTop {
+				if tbl.borders.showCenter { //&& tbl.borders.showTop {
 					if tbl.borders.boldHeader && tbl.borders.boldCenter {
 						fmt.Print("╋")
 					} else if tbl.borders.boldHeader && !tbl.borders.boldCenter {
@@ -293,17 +261,18 @@ func (tbl *Table) printHeaderBorder() {
 					} else {
 						fmt.Print("┼")
 					}
-				} else if tbl.borders.showCenter && !tbl.borders.showTop {
-					if tbl.borders.boldHeader && tbl.borders.boldCenter {
-						fmt.Print("┳")
-					} else if tbl.borders.boldHeader && !tbl.borders.boldCenter {
-						fmt.Print("┯")
-					} else if !tbl.borders.boldHeader && tbl.borders.boldCenter {
-						fmt.Print("┰")
-					} else {
-						fmt.Print("┬")
-					}
-				} else if !tbl.borders.showCenter && tbl.borders.showTop {
+					// } else if tbl.borders.showCenter && !tbl.borders.showTop {
+					// 	if tbl.borders.boldHeader && tbl.borders.boldCenter {
+					// 		fmt.Print("┳")
+					// 	} else if tbl.borders.boldHeader && !tbl.borders.boldCenter {
+					// 		fmt.Print("┯")
+					// 	} else if !tbl.borders.boldHeader && tbl.borders.boldCenter {
+					// 		fmt.Print("┰")
+					// 	} else {
+					// 		fmt.Print("┬")
+					// 	}
+					// } else if !tbl.borders.showCenter && tbl.borders.showTop {
+				} else {
 					if tbl.borders.boldHeader && tbl.borders.boldCenter {
 						fmt.Print("━")
 					} else if tbl.borders.boldHeader && !tbl.borders.boldCenter {
@@ -313,8 +282,6 @@ func (tbl *Table) printHeaderBorder() {
 					} else {
 						fmt.Print("─")
 					}
-				} else {
-					fmt.Print("WX")
 				}
 			}
 		}
@@ -532,22 +499,4 @@ func (tbl *Table) printHorizontal() {
 		fmt.Print("\n")
 	}
 
-}
-
-// ternary is a shim to allow ternary operations in Go
-func ternary(check bool, valid interface{}, invalid interface{}) interface{} {
-	if check {
-		return valid
-	}
-	return invalid
-}
-
-func max(val ...int) (max int) {
-	max = val[0]
-	for i := 1; i < len(val); i++ {
-		if val[i] > max {
-			max = val[i]
-		}
-	}
-	return
 }
