@@ -51,9 +51,16 @@ const (
 	Right2
 	Top2
 	Header2
-	Bottom2
+	Bottom2195
 	Horizontal2
 )
+
+type debugCol struct {
+	ColName       string
+	Chars         int
+	PaddingBefore int
+	PaddingAfter  int
+}
 
 var (
 	// DefaultPadding specifies the number of spaces around content in columns.
@@ -156,7 +163,7 @@ func (tbl *Table) Align(colName string, alignment int, includeHeader bool) {
 }
 
 func (tbl *Table) Print() {
-	tbl.fillWidths()
+	tbl.FillWidths()
 	tbl.printTopBorder()
 	tbl.printHeaders()
 	tbl.printHeaderBorder()
@@ -170,6 +177,7 @@ func (tbl *Table) Print() {
 }
 
 func (tbl *Table) printTopBorder() {
+	var calcWidth int
 	if tbl.borders.showTop {
 		if tbl.borders.showLeft {
 			if tbl.borders.boldTop && tbl.borders.boldLeft {
@@ -183,10 +191,11 @@ func (tbl *Table) printTopBorder() {
 			}
 		}
 		for i := 0; i < len(tbl.columns); i++ {
+			calcWidth, _ = tbl.CalcWidth(tbl.columns[i], true, false)
 			if tbl.borders.boldTop {
-				fmt.Print(strings.Repeat("━", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("━", calcWidth))
 			} else {
-				fmt.Print(strings.Repeat("─", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("─", calcWidth))
 			}
 			if tbl.borders.showCenter && i < len(tbl.columns)-1 {
 				if tbl.borders.boldTop && tbl.borders.boldCenter {
@@ -217,6 +226,7 @@ func (tbl *Table) printTopBorder() {
 }
 
 func (tbl *Table) printHeaderBorder() {
+	var calcWidth int
 	if tbl.borders.showHeader {
 		if tbl.borders.showLeft && tbl.borders.showTop {
 			if tbl.borders.boldHeader && tbl.borders.boldLeft {
@@ -240,10 +250,11 @@ func (tbl *Table) printHeaderBorder() {
 			}
 		}
 		for i := 0; i < len(tbl.columns); i++ {
+			calcWidth, _ = tbl.CalcWidth(tbl.columns[i], true, false)
 			if tbl.borders.boldHeader {
-				fmt.Print(strings.Repeat("━", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("━", calcWidth))
 			} else {
-				fmt.Print(strings.Repeat("─", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("─", calcWidth))
 			}
 			if tbl.borders.showCenter && i < len(tbl.columns)-1 {
 				if tbl.borders.showCenter { //&& tbl.borders.showTop {
@@ -307,6 +318,7 @@ func (tbl *Table) printHeaderBorder() {
 }
 
 func (tbl *Table) printBottomBorder() {
+	var calcWidth int
 	if tbl.borders.showBottom {
 		if tbl.borders.showLeft {
 			if tbl.borders.boldBottom && tbl.borders.boldLeft {
@@ -320,11 +332,11 @@ func (tbl *Table) printBottomBorder() {
 			}
 		}
 		for i := 0; i < len(tbl.columns); i++ {
-
+			calcWidth, _ = tbl.CalcWidth(tbl.columns[i], true, false)
 			if tbl.borders.boldBottom {
-				fmt.Print(strings.Repeat("━", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("━", calcWidth))
 			} else {
-				fmt.Print(strings.Repeat("─", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("─", calcWidth))
 			}
 			if tbl.borders.showCenter && i < len(tbl.columns)-1 {
 				if tbl.borders.boldBottom && tbl.borders.boldCenter {
@@ -372,10 +384,10 @@ func (tbl *Table) printHeaders() {
 		fmt.Printf(
 			fmt.Sprintf(
 				"%s%%%s%ds%s",
-				strings.Repeat(" ", tbl.padding(true, i)),
+				strings.Repeat(" ", tbl.Padding(true, i)),
 				ternary(tbl.headerAlignment[tbl.columns[i]] == 1, "-", "").(string),
 				tbl.columnWidths[tbl.columns[i]],
-				strings.Repeat(" ", tbl.padding(false, i)),
+				strings.Repeat(" ", tbl.Padding(false, i)),
 			),
 			tbl.columns[i],
 		)
@@ -420,10 +432,10 @@ func (tbl *Table) printCells(rowNum int) {
 		fmt.Printf(
 			fmt.Sprintf(
 				"%s%%%s%ds%s",
-				strings.Repeat(" ", tbl.padding(true, i)),
+				strings.Repeat(" ", tbl.Padding(true, i)),
 				ternary(tbl.columnAlignment[tbl.columns[i]] == 1, "-", "").(string),
 				tbl.columnWidths[tbl.columns[i]],
-				strings.Repeat(" ", tbl.padding(false, i)),
+				strings.Repeat(" ", tbl.Padding(false, i)),
 			),
 			tbl.rows[rowNum][i],
 		)
@@ -449,6 +461,7 @@ func (tbl *Table) printCells(rowNum int) {
 }
 
 func (tbl *Table) printHorizontal() {
+	var calcWidth int
 	if tbl.borders.showHorizontal {
 		if tbl.borders.showLeft {
 			if tbl.borders.boldHorizontal && tbl.borders.boldLeft {
@@ -463,10 +476,11 @@ func (tbl *Table) printHorizontal() {
 		}
 
 		for i := 0; i < len(tbl.columns); i++ {
+			calcWidth, _ = tbl.CalcWidth(tbl.columns[i], true, false)
 			if tbl.borders.boldHorizontal {
-				fmt.Print(strings.Repeat("━", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("━", calcWidth))
 			} else {
-				fmt.Print(strings.Repeat("─", tbl.calcWidth(tbl.columns[i], true)))
+				fmt.Print(strings.Repeat("─", calcWidth))
 			}
 			if tbl.borders.showCenter && i < len(tbl.columns)-1 {
 				if tbl.borders.boldHorizontal && tbl.borders.boldCenter {
@@ -494,8 +508,4 @@ func (tbl *Table) printHorizontal() {
 		fmt.Print("\n")
 	}
 
-}
-
-func (tbl *Table) ColumnCount() {
-	return len(tbl.columns)
 }

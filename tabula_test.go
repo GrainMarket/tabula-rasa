@@ -120,7 +120,7 @@ func TestNewTable(t *testing.T) {
 	for i := 0; i < 128; i++ {
 		for j := 0; j < 128; j++ {
 			next = buildConf((j&Left != 0), (j&Center != 0), (j&Right != 0), (j&Top != 0), (j&Header != 0), (j&Bottom != 0), (j&Horizontal != 0), (i&Left != 0), (i&Center != 0), (i&Right != 0), (i&Top != 0), (i&Header != 0), (i&Bottom != 0), (i&Horizontal != 0))
-			if intInArray(next, done) == -1 {
+			if getSliceIndexInt(next, done) == -1 {
 				done = append(done, next)
 				printWithConf(tbl, (j&Left != 0), (j&Center != 0), (j&Right != 0), (j&Top != 0), (j&Header != 0), (j&Bottom != 0), (j&Horizontal != 0), (i&Left != 0), (i&Center != 0), (i&Right != 0), (i&Top != 0), (i&Header != 0), (i&Bottom != 0), (i&Horizontal != 0))
 				if line%3 == 2 {
@@ -280,15 +280,3 @@ func printWithConf(tbl *Table, sLeft, sCenter, sRight, sTop, sHeader, sBottom, s
 // Header+Bold, Vertical+Bold (HeaderBorder Missing)
 // Top, Header+Bold, Vertical (HeaderBorder Bold Vertical on middle & end)
 // Top+Bold, Header+Bold, Vertical (HeaderBorder Bold Vertical on middle & end)
-
-// intInArray checks if the integer is in the array
-func intInArray(needle int, haystack []int) (index int) {
-	var val int
-	for index, val = range haystack {
-		if val == needle {
-			return
-		}
-	}
-	index = -1
-	return
-}

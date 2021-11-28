@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"strings"
 
 	tabula "github.com/GrainMarket/tabula-rasa"
 )
@@ -27,24 +26,12 @@ func demo() {
 	}
 
 	tbl.SetBorder(tabula.Center, true, false)
-	tbl.SetBorder(tabula.Header, true, true)
-	tbl.SetBorder(tabula.Top, true, false)
-
-	tbl.fillWidths()
-	for i := 0; i < tbl.ColumnCount(); i++ {
-		padding := tbl.padding(true, i)
-		width := tbl.calcWidth(columns[i], true)
-		fmt.Printf("Column %d > width = %d | pre-content padding = %d | ", i, width, padding)
-		padding = tbl.padding(false, i)
-		fmt.Printf("post-content padding = %d (%t)\n", padding, tbl.borders.showCenter)
-	}
-	for i := 0; i < tbl.ColumnCount(); i++ {
-		if i != tbl.ColumnCount()-1 {
-			fmt.Printf("%s|", strings.Repeat("_", tbl.calcWidth(columns[i], true)))
-		} else {
-			fmt.Printf("%s\n", strings.Repeat("-", tbl.calcWidth(columns[i], true)))
-		}
-	}
+	tbl.SetBorder(tabula.Header, true, false)
+	//tbl.SetBorder(tabula.Top, true, false)
 
 	tbl.Print()
+}
+
+func main() {
+	demo()
 }
