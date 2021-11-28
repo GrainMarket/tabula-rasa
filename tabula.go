@@ -156,12 +156,7 @@ func (tbl *Table) Align(colName string, alignment int, includeHeader bool) {
 }
 
 func (tbl *Table) Print() {
-	for _, row := range tbl.rows {
-		for col, cell := range row {
-			tbl.columnWidths[tbl.columns[col]] = max(tbl.columnWidths[tbl.columns[col]], len(cell))
-		}
-	}
-
+	tbl.fillWidths()
 	tbl.printTopBorder()
 	tbl.printHeaders()
 	tbl.printHeaderBorder()
@@ -255,7 +250,7 @@ func (tbl *Table) printHeaderBorder() {
 					if tbl.borders.boldHeader && tbl.borders.boldCenter {
 						fmt.Print("╋")
 					} else if tbl.borders.boldHeader && !tbl.borders.boldCenter {
-						fmt.Print("╇")
+						fmt.Print("┿")
 					} else if !tbl.borders.boldHeader && tbl.borders.boldCenter {
 						fmt.Print("╂")
 					} else {
@@ -499,4 +494,8 @@ func (tbl *Table) printHorizontal() {
 		fmt.Print("\n")
 	}
 
+}
+
+func (tbl *Table) ColumnCount() {
+	return len(tbl.columns)
 }

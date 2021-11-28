@@ -3,12 +3,14 @@ package tables
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 )
 
 func TestOneTable(t *testing.T) {
-	tbl := NewTable("Col1", "Col2", "Col3", "Col4")
+	columns := []string{"Col1", "Col2", "Col3", "Col4"}
+	tbl := NewTable(columns...)
 	if len(tbl.columns) != 4 {
 		t.Error("Expected 2 columns, got", len(tbl.columns))
 	}
@@ -28,14 +30,23 @@ func TestOneTable(t *testing.T) {
 	}
 
 	tbl.SetBorder(Center, true, false)
-	tbl.SetBorder(Header, true, false)
-	// tbl.SetBorder(Top, true, false)
+	tbl.SetBorder(Header, true, true)
+	tbl.SetBorder(Top, true, false)
 
+	tbl.fillWidths()
 	for i := 0; i < len(tbl.columns); i++ {
 		padding := tbl.padding(true, i)
-		fmt.Printf("Column %d pre-content padding = %d (%t)\n", i, padding, tbl.borders.showCenter)
+		width := tbl.calcWidth(columns[i], true)
+		fmt.Printf("Column %d > width = %d | pre-content padding = %d | ", i, width, padding)
 		padding = tbl.padding(false, i)
-		fmt.Printf("Column %d post-content padding = %d (%t)\n", i, padding, tbl.borders.showCenter)
+		fmt.Printf("post-content padding = %d (%t)\n", padding, tbl.borders.showCenter)
+	}
+	for i := 0; i < len(tbl.columns); i++ {
+		if i != len(tbl.columns)-1 {
+			fmt.Printf("%s|", strings.Repeat("_", tbl.calcWidth(columns[i], true)))
+		} else {
+			fmt.Printf("%s\n", strings.Repeat("-", tbl.calcWidth(columns[i], true)))
+		}
 	}
 
 	tbl.Print()

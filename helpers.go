@@ -18,6 +18,14 @@ func max(val ...int) (max int) {
 	return
 }
 
+func (tbl *Table) fillWidths() {
+	for _, row := range tbl.rows {
+		for col, cell := range row {
+			tbl.columnWidths[tbl.columns[col]] = max(tbl.columnWidths[tbl.columns[col]], len(cell))
+		}
+	}
+}
+
 func (tbl *Table) calcWidth(column string, pad bool) int {
 	if pad {
 		i := 0
